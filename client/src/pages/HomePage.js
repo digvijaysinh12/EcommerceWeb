@@ -15,7 +15,7 @@ const HomePage = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoding] = useState(false);
-  const { cart,setCart } = useCart();
+  const [cart,setCart ] = useCart();
 
   const navigate = useNavigate()
 
