@@ -23,6 +23,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Categories from "./pages/Categories";
 import CategoryProduct from "./pages/CategoryProduct";
 import CartPage from "./pages/CartPage";
+import Profile from "./pages/user/Profile";
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
         {/* Private Route for User Dashboard */}
         <Route path="/dashboard" element={<PrivateRoute />}>
           <Route path="user" element={<Dashboard />} />
+          <Route path="user/profile" element={<Profile />} />
+          
         </Route>
 
         {/* Admin Route for Admin Dashboard */}
