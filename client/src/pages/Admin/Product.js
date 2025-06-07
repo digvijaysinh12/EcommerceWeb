@@ -11,11 +11,11 @@ const Product = () => {
   // Fetch all products
   const getAllProducts = async () => {
     try {
-      const { data } = await axios.get('/api/v1/product/get-product');
+      const { data } = await axios.get("/api/v1/product/get-product");
       setProducts(data.products);
     } catch (error) {
       console.log(error);
-      toast.error('Something went wrong');
+      toast.error("Something went wrong while fetching products.");
     }
   };
 
@@ -25,39 +25,56 @@ const Product = () => {
 
   return (
     <Layout title={"Dashboard - All Products"}>
-      <div className='container mt-3'>
-        <div className='row'>
+      <div className="container mt-4">
+        <div className="row">
           {/* Sidebar Section */}
-          <div className='col-md-3'>
+          <div className="col-md-3 mb-3">
             <AdminMenu />
           </div>
 
-          {/* Product Display Section */}
-          <div className='col-md-9'>
-            <h1 className='text-center mb-4'>All Products List</h1>
+          {/* Product List Section */}
+          <div className="col-md-9">
+            <h2 className="text-center mb-4">All Products</h2>
 
-            {/* Empty state handling */}
+            {/* No Products Available */}
             {products.length === 0 ? (
-              <div className='alert alert-info text-center'>No products available.</div>
+              <div className="alert alert-warning text-center">
+                No products available.
+              </div>
             ) : (
-              <div className='d-flex flex-wrap'>
-                {products?.map((p) => (
-                  <Link key={p._id} to={`/dashboard/admin/product/${p.slug}`} className="product-link text-decoration-none ">
-                    <div className="card m-3" style={{ width: '15rem' }}>
-                      <img
-                        src={`/api/v1/product/product-photo/${p._id}`}
-                        className="card-img-top"
-                        alt={p.name}
-
-                      />
-                      <div className="card-body">
-                        <h6 className="card-title">{p.name}</h6>
-                        <p className="card-text" style={{ fontSize: "13px" }}>
-                          {p.description.length > 100 ? `${p.description.slice(0, 100)}...` : p.description}
-                        </p>
+              <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                {products.map((p) => (
+                  <div className="col" key={p._id}>
+                    <Link
+                      to={`/dashboard/admin/product/${p.slug}`}
+                      className="text-decoration-none"
+                    >
+                      <div className="card h-100 shadow-sm border-0 product-card">
+                        <img
+                          src={`/api/v1/product/product-photo/${p._id}`}
+                          className="card-img-top"
+                          alt={p.name}
+                          style={{
+                            height: "200px",
+                            objectFit: "cover",
+                            borderTopLeftRadius: "0.5rem",
+                            borderTopRightRadius: "0.5rem",
+                          }}
+                        />
+                        <div className="card-body d-flex flex-column">
+                          <h5 className="card-title text-dark">{p.name}</h5>
+                          <p className="card-text text-muted" style={{ fontSize: "14px" }}>
+                            {p.description.length > 90
+                              ? `${p.description.slice(0, 90)}...`
+                              : p.description}
+                          </p>
+                          <div className="mt-auto text-end">
+                            <span className="badge bg-primary">View / Edit</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 ))}
               </div>
             )}
