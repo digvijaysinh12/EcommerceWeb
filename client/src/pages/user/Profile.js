@@ -50,10 +50,10 @@ const Profile = () => {
 
   return (
     <Layout title="Your Profile">
-      <div className="container mt-4">
+      <div className="container-fluid m-3 p-3">
         <div className="row">
           {/* Sidebar */}
-          <div className="col-md-3 mb-3">
+          <div className="col-md-3 ">
             <UserMenu />
           </div>
 
