@@ -3,23 +3,20 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const UserMenu = () => {
+  const getLinkClass = ({ isActive }) =>
+    `list-group-item list-group-item-action${isActive ? " active" : ""}`;
+
   return (
     <Layout>
       <div className="text-center">
         <div className="list-group">
-          <NavLink to="/dashboard/user" className="list-group-item list-group-item-action active">
+          <NavLink to="/dashboard/user" className={getLinkClass}>
             <h4>Dashboard</h4>
           </NavLink>
-          <NavLink
-            to="/dashboard/user/profile"
-            className="list-group-item list-group-item-action"
-          >
+          <NavLink to="/dashboard/user/profile" className={getLinkClass}>
             Profile
           </NavLink>
-          <NavLink
-            to="/dashboard/user/orders"
-            className="list-group-item list-group-item-action"
-          >
+          <NavLink to="/dashboard/user/orders" className={getLinkClass}>
             Orders
           </NavLink>
         </div>
