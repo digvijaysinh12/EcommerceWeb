@@ -24,6 +24,7 @@ import Categories from "./pages/Categories";
 import CategoryProduct from "./pages/CategoryProduct";
 import CartPage from "./pages/CartPage";
 import Profile from "./pages/user/Profile";
+import Orders from "./pages/user/Orders";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
         <Route path="/dashboard" element={<PrivateRoute />}>
           <Route path="user" element={<Dashboard />} />
           <Route path="user/profile" element={<Profile />} />
+          <Route path="user/orders" element={<Orders />} />
+          
           
         </Route>
 
