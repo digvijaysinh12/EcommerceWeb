@@ -1,4 +1,4 @@
-# 🛒 Ecommerce App 2023 | MERN Stack Project
+# 🛒 Ecommerce WebSite | MERN Stack Project
 
 This is a full-featured ecommerce application built using the **MERN stack**: **MongoDB**, **Express.js**, **React**, and **Node.js**.  
 It demonstrates real-world features such as user authentication, product management, shopping cart functionality, order processing, and payment gateway integration.
