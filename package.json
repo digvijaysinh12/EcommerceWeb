@@ -16,6 +16,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.6",
+    "braintree": "^3.31.0",
     "buffer": "^6.0.3",
     "colors": "^1.4.0",
     "concurrently": "^9.1.2",
