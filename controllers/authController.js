@@ -1,115 +1,143 @@
 import { useReducer } from "react";
-import { hashPassword,comparePassword } from "../helpers/authHelper.js";
+import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import userModel from "../models/userModel.js";
 import JWT from "jsonwebtoken";
+import otpGeneraotor from "otp-generator"
+import nodemailer from "nodemailer";
 
-export const registerController = async(req,res) => {
-    const { name, email, password, phone, address,quetion } = req.body;
-    try{
-        if(!name){
-            return res.send({message:'Name is required'});
+export const registerController = async (req, res) => {
+    const { name, email, password, phone, address, quetion } = req.body;
+    try {
+        if (!name) {
+            return res.send({ message: 'Name is required' });
         }
-        if(!email){
-            return res.send({message:'Email is required'});
+        if (!email) {
+            return res.send({ message: 'Email is required' });
         }
-        if(!password){
-            return res.send({message:'Password is required'});
+        if (!password) {
+            return res.send({ message: 'Password is required' });
         }
-        if(!phone){
-            return res.send({message:'Phone is required'});
+        if (!phone) {
+            return res.send({ message: 'Phone is required' });
         }
-        if(!address){
-            return res.send({message:'Adress is required'});
+        if (!address) {
+            return res.send({ message: 'Adress is required' });
         }
-        if(!quetion){
-            return res.send({message:'Sports Name is required'});
-        }        
+        if (!quetion) {
+            return res.send({ message: 'Sports Name is required' });
+        }
         //existing user
-        const existingUser = await userModel.findOne( {email} );
+        const existingUser = await userModel.findOne({ email });
 
-        if(existingUser){
+        if (existingUser) {
             return res.status(200).send({
-                success:false,
-                message:'already Register please login',
+                success: false,
+                message: 'already Register please login',
             });
         }
 
         //register user
         const hashedPassword = await hashPassword(password);
 
-        const user = new userModel({name,email,password:hashedPassword,phone,address,quetion}).save();
+        const user = new userModel({ name, email, password: hashedPassword, phone, address, quetion }).save();
 
         res.status(201).send({
-            success:true,
-            message:"User Register Successfully",
-            user:name
+            success: true,
+            message: "User Register Successfully",
+            user: name
         })
-    }catch(error){
+    } catch (error) {
         console.log(error);
         res.status(500).send({
-            success:false,
-            message:'Error in Registration',
+            success: false,
+            message: 'Error in Registration',
             error,
         })
     }
 }
+const otpStore = {};
+export const sendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
 
-export const sendOTP = async(req,res) => {
-    try{
+        if (!email) return res.status(400).json({ message: "Email is required" });
 
-    }catch(error){
+        const otp = otpGeneraotor.generate(6, { digits: true, alphabets: false });
+        otpStore[email] = otp;
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.USER,
+                pass: process.env.pass,
+            },
+        })
+
+        const mailOptions = {
+            from: '"SmartPhone App" <process.env.USER>',
+            to: email,
+            subject: "Email Verification OTP",
+            text: `Your OTP for verification is ${otp}. It is valid fot t minutes.`,
+        };
+        try {
+            await transporter.sendMail(mailOptions);
+            res.status(200).json({ success: true, message: "OTP sent to email" });
+        } catch (err) {
+            res.status(500).json({ success: false, message: "Failed to send email", error: err.message });
+        }
+    } catch (error) {
         console.log(error);
-            res.status(500).send({
-            success:false,
-            message:'Error in Login',
-            error:error,
+        res.status(500).send({
+            success: false,
+            message: 'Error in Sending OTP',
+            error: error,
         })
     }
 }
-export const loginController = async(req,res) => {
-    try{
-        const {email,password} = req.body;
-        if(!email||!password){
+export const loginController = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
             return res.status(404).send({
-                success:false,
-                message:"Invalid email or password"
+                success: false,
+                message: "Invalid email or password"
             });
         }
         //check user
-        const user = await userModel.findOne({email});
-        if(!user){
+        const user = await userModel.findOne({ email });
+        if (!user) {
             res.status(404).send({
-                success:false,
-                message:'email is not registered'
+                success: false,
+                message: 'email is not registered'
             });
         }
-        const match = await comparePassword(password,user.password);
-        if(!match){
+        const match = await comparePassword(password, user.password);
+        if (!match) {
             res.status(404).send({
-                success:false,
-                message:"Invalid password"
+                success: false,
+                message: "Invalid password"
             });
         }
         //token
-        const token = await JWT.sign({_id:user._id},process.env.JWT_SECRET,{expiresIn:"7d"});
+        const token = await JWT.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.status(200).send({
-            success:true,
-            message:"Login Successfully",
-            user:{
-                name:user.name,
-                email:user.email,
-                phone:user.phone,
-                address:user.address,
-                role:user.role,
+            success: true,
+            message: "Login Successfully",
+            user: {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                role: user.role,
             },
             token
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         res.status(500).send({
-            success:false,
-            message:'Error in Login',
-            error:error,
+            success: false,
+            message: 'Error in Login',
+            error: error,
         })
     }
 }
@@ -154,59 +182,59 @@ export const forgotPasswordController = async (req, res) => {
 };
 
 
-export const testController = (req,res) => {
+export const testController = (req, res) => {
     res.send("Protected Routes");
 }
 
 // update profile
 
-export const updateProfileController = async(req,res) => {
-    try{
-        const {name ,email, password, address, phone} = req.body;
-        
+export const updateProfileController = async (req, res) => {
+    try {
+        const { name, email, password, address, phone } = req.body;
+
         const user = await userModel.findById(req.user._id);
 
-    //password
-    if (password && password.length < 6) {
-      return res.json({ error: "Passsword is required and 6 character long" });
+        //password
+        if (password && password.length < 6) {
+            return res.json({ error: "Passsword is required and 6 character long" });
+        }
+        const hashedPassword = password ? await hashPassword(password) : undefined;
+        const updatedUser = await userModel.findByIdAndUpdate(
+            req.user._id,
+            {
+                name: name || user.name,
+                password: hashedPassword || user.password,
+                phone: phone || user.phone,
+                address: address || user.address,
+            },
+            { new: true }
+        );
+        res.status(200).send({
+            success: true,
+            message: "Profile Updated SUccessfully",
+            updatedUser,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(400).send({
+            success: false,
+            message: "Error WHile Update profile",
+            error,
+        });
     }
-    const hashedPassword = password ? await hashPassword(password) : undefined;
-    const updatedUser = await userModel.findByIdAndUpdate(
-      req.user._id,
-      {
-        name: name || user.name,
-        password: hashedPassword || user.password,
-        phone: phone || user.phone,
-        address: address || user.address,
-      },
-      { new: true }
-    );
-    res.status(200).send({
-      success: true,
-      message: "Profile Updated SUccessfully",
-      updatedUser,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send({
-      success: false,
-      message: "Error WHile Update profile",
-      error,
-    });
-  }
 }
 
 
 //orders
 
-export const getOrderController = async(req,res) => {
-    try{
-        
-    }catch(error){
+export const getOrderController = async (req, res) => {
+    try {
+
+    } catch (error) {
         console.log(error);
         res.status(500).send({
-            success:false,
-            message:'Error While Getting Orders',
+            success: false,
+            message: 'Error While Getting Orders',
             error
         })
     }
