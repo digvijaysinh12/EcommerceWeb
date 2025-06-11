@@ -7,6 +7,9 @@ const router = express.Router();
 //routing   
 //REGISTER || METHOD POST
 router.post('/register' , registerController);
+//SEND OTP
+router.post('/send-otp',sendOTP);
+
 
 //LOGIN || METHOD POST
 router.post('/login', loginController);
