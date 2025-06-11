@@ -54,6 +54,18 @@ export const registerController = async(req,res) => {
     }
 }
 
+export const sendOTP = async(req,res) => {
+    try{
+
+    }catch(error){
+        console.log(error);
+            res.status(500).send({
+            success:false,
+            message:'Error in Login',
+            error:error,
+        })
+    }
+}
 export const loginController = async(req,res) => {
     try{
         const {email,password} = req.body;
