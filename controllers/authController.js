@@ -99,7 +99,7 @@ export const verifyOTP = async(req,res) => {
     const {email,otp} = req.body;
     if(otpStore[email] && otpStore[email] === otp){
         delete otpStore[email];
-        return res.json({success:true, message : "OTP verified successfully"});
+        return res.status(200).json({success:true, message : "OTP verified successfully"});
     }else{
         return res.status(400).json({
             success: false,
