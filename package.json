@@ -35,7 +35,8 @@
     "react-helmet": "^6.1.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "stripe": "^18.2.1"
   },
   "_notes": {
     "nodemon": "When we make changes to the code, nodemon automatically detects the changes and restarts the server."
