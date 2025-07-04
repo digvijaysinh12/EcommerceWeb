@@ -101,16 +101,26 @@ const HomePage = () => {
           {/* Sidebar Filters */}
           <div className="col-md-3 mb-4">
             <h5 className="fw-bold text-center">Filter by Category</h5>
-            <div className="filter-box">
-              {categories?.map((c) => (
-                <Checkbox
-                  key={c._id}
-                  onChange={(e) => handleFilter(e.target.checked, c._id)}
-                >
-                  {c.name}
-                </Checkbox>
-              ))}
-            </div>
+<div className="filter-box">
+  {categories?.map((c) => {
+    const isChecked = checked.includes(c._id);
+    return (
+      <div 
+        key={c._id} 
+        style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}
+      >
+        <input
+          type="checkbox"
+          id={`checkbox-${c._id}`}
+          checked={isChecked}
+          onChange={(e) => handleFilter(e.target.checked, c._id)}
+        />
+        <label htmlFor={`checkbox-${c._id}`}>{c.name}</label>
+      </div>
+    );
+  })}
+</div>
+
             <h5 className="fw-bold text-center mt-4">Filter by Prices</h5>
             <Radio.Group
               onChange={(e) => setRadio(e.target.value)}
