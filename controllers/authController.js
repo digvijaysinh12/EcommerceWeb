@@ -2,6 +2,7 @@ import { useReducer } from "react";
 import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import userModel from "../models/userModel.js";
 import JWT from "jsonwebtoken";
+import orderModel from "../models/orderModel.js";
 import otpGeneraotor from "otp-generator"
 import nodemailer from "nodemailer";
 
@@ -241,14 +242,16 @@ export const updateProfileController = async (req, res) => {
 //orders
 
 export const getOrderController = async (req, res) => {
-    try {
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            success: false,
-            message: 'Error While Getting Orders',
-            error
-        })
-    }
+  try {
+    const orders = await orderModel.find({ buyer: req.user._id })
+      .populate("products", "-photo")
+      .populate("buyer", "name")
+      .lean();
+    res.json(orders);
+  } catch (err) {
+    console.error("Error fetching orders:", err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+
 }

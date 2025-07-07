@@ -115,7 +115,7 @@ const Profile = () => {
                       placeholder="Enter Your Address"
                     />
                   </div>
-                  <div className="text-end">
+                  <div className="text-center">
                     <button type="submit" className="btn btn-primary">
                       Update
                     </button>

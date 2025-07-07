@@ -1,10 +1,10 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/auth';
-import { toast } from 'react-toastify';
-import Search from '../Form/Search';
-import useCategory from '../../hooks/useCategory';
-import { useCart } from '../../context/cart';
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/auth";
+import { toast } from "react-toastify";
+import Search from "../Form/Search";
+import useCategory from "../../hooks/useCategory";
+import { useCart } from "../../context/cart";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
@@ -13,121 +13,202 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setAuth({ user: null, token: '' });
-    localStorage.removeItem('auth');
-    toast.success("Logout Successfully", {
-      onClose: () => {
-        setTimeout(() => {
-          navigate('/login');
-        }, 1000);
-      },
-    });
+    setAuth({ user: null, token: "" });
+    localStorage.removeItem("auth");
+    toast.success("Logout Successfully");
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light navbar shadow-sm">
-      <NavLink to="/" className="navbar-brand d-flex align-items-center">
+    <nav
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "10px 20px",
+        borderBottom: "1px solid #ddd",
+        backgroundColor: "#f8f9fa",
+        flexWrap: "wrap",
+        gap: "15px",
+      }}
+    >
+      {/* Brand */}
+      <NavLink
+        to="/"
+        style={{
+          fontWeight: "bold",
+          fontSize: "20px",
+          color: "#333",
+          textDecoration: "none",
+          marginRight: "auto",
+        }}
+      >
         🛒 ECOMMERCE APP
       </NavLink>
 
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span className="navbar-toggler-icon"></span>
-      </button>
+      {/* Search */}
+      <div style={{ flexGrow: 1, minWidth: "200px" }}>
+        <Search />
+      </div>
 
-      <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav ms-auto align-items-center">
-          <li className="nav-item">
-            <div className='search-bar'>
-            <Search />
-            </div>
-          </li>
+      {/* Navigation Links */}
+      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+        <NavLink
+          to="/"
+          style={({ isActive }) => ({
+            color: isActive ? "#007bff" : "#555",
+            textDecoration: "none",
+            fontWeight: isActive ? "600" : "400",
+          })}
+        >
+          HOME
+        </NavLink>
 
-          <li className="nav-item">
-            <NavLink to="/" className="nav-link">
-              HOME
-            </NavLink>
-          </li>
-
-          <li className="nav-item dropdown">
-            <button
-              className="btn btn-light dropdown-toggle"
-              id="categoryDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
+        {/* Simple category dropdown */}
+        <div style={{ position: "relative" }}>
+          <span
+            style={{
+              cursor: "pointer",
+              color: "#555",
+              fontWeight: "500",
+              userSelect: "none",
+            }}
+            onClick={() => {
+              const menu = document.getElementById("category-menu");
+              if (menu.style.display === "block") {
+                menu.style.display = "none";
+              } else {
+                menu.style.display = "block";
+              }
+            }}
+          >
+            CATEGORY ▼
+          </span>
+          <div
+            id="category-menu"
+            style={{
+              position: "absolute",
+              top: "25px",
+              left: 0,
+              backgroundColor: "white",
+              border: "1px solid #ccc",
+              padding: "10px",
+              display: "none",
+              zIndex: 100,
+              minWidth: "150px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            }}
+            onMouseLeave={() => {
+              document.getElementById("category-menu").style.display = "none";
+            }}
+          >
+            <NavLink
+              to="/categories"
+              style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
+              onClick={() => (document.getElementById("category-menu").style.display = "none")}
             >
-              CATEGORY
-            </button>
-            <ul className="dropdown-menu" aria-labelledby="categoryDropdown">
-              <li>
-                <NavLink className="dropdown-item" to="/categories">
-                  All Categories
-                </NavLink>
-              </li>
-              {categories.map((c) => (
-                <li key={c.id}>
-                  <NavLink className="dropdown-item" to={`/category/${c.slug}`}>
-                    {c.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </li>
-
-          {!auth?.user ? (
-            <>
-              <li className="nav-item">
-                <NavLink to="/register" className="nav-link">
-                  REGISTER
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/login" className="nav-link">
-                  LOGIN
-                </NavLink>
-              </li>
-            </>
-          ) : (
-            <li className="nav-item dropdown">
-              <button
-                className="btn btn-light dropdown-toggle"
-                id="userDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {auth?.user?.name}
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="userDropdown">
-                <li>
-                  <NavLink
-                    to={`/dashboard/${auth?.user?.role === 1 ? 'admin' : 'user'}`}
-                    className="dropdown-item"
-                  >
-                    DASHBOARD
-                  </NavLink>
-                </li>
-                <li>
-                  <span className="dropdown-item" onClick={handleLogout}>
-                    LOGOUT
-                  </span>
-                </li>
-              </ul>
-            </li>
-          )}
-
-          <li className="nav-item">
-            <NavLink to="/cart" className="nav-link cart btn btn-light">
-              CART ({cart?.length})
+              All Categories
             </NavLink>
-          </li>
-        </ul>
+            {categories.map((c) => (
+              <NavLink
+                key={c.id}
+                to={"/category/" + c.slug}
+                style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
+                onClick={() => (document.getElementById("category-menu").style.display = "none")}
+              >
+                {c.name}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+
+        {/* Auth Links */}
+        {auth.user === null || auth.user === undefined ? (
+          <>
+            <NavLink
+              to="/register"
+              style={({ isActive }) => ({
+                color: isActive ? "#007bff" : "#555",
+                textDecoration: "none",
+              })}
+            >
+              REGISTER
+            </NavLink>
+            <NavLink
+              to="/login"
+              style={({ isActive }) => ({
+                color: isActive ? "#007bff" : "#555",
+                textDecoration: "none",
+              })}
+            >
+              LOGIN
+            </NavLink>
+          </>
+        ) : (
+          <div style={{ position: "relative" }}>
+            <span
+              style={{ cursor: "pointer", color: "#555", fontWeight: "500" }}
+              onClick={() => {
+                const menu = document.getElementById("user-menu");
+                if (menu.style.display === "block") {
+                  menu.style.display = "none";
+                } else {
+                  menu.style.display = "block";
+                }
+              }}
+            >
+              {auth.user.name} ▼
+            </span>
+            <div
+              id="user-menu"
+              style={{
+                position: "absolute",
+                top: "25px",
+                right: 0,
+                backgroundColor: "white",
+                border: "1px solid #ccc",
+                padding: "10px",
+                display: "none",
+                zIndex: 100,
+                minWidth: "120px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              }}
+              onMouseLeave={() => {
+                document.getElementById("user-menu").style.display = "none";
+              }}
+            >
+              <NavLink
+                to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
+                onClick={() => (document.getElementById("user-menu").style.display = "none")}
+              >
+                DASHBOARD
+              </NavLink>
+              <span
+                style={{ display: "block", padding: "5px 0", cursor: "pointer", color: "#333" }}
+                onClick={handleLogout}
+              >
+                LOGOUT
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Cart */}
+        <NavLink
+          to="/cart"
+          style={{
+            backgroundColor: "#007bff",
+            color: "white",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            textDecoration: "none",
+            fontWeight: "600",
+          }}
+        >
+          CART ({cart.length})
+        </NavLink>
       </div>
     </nav>
   );
