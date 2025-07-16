@@ -96,14 +96,14 @@ const CreateCategory = () => {
           <div className="col-md-3">
             <AdminMenu />
           </div>
-          <div className="col-md-9">
-            <h1>Manage Category</h1>
-            <div className="p-3 w-50">
+          <div className="col-md-9 ">
+            <h1 className="text-center">Manage Category</h1>
+            <div className="w-100 d-flex justify-content-center">
               <CategoryForm handleSubmit={handleSubmit} value={name} setValue={setName} />
             </div>
-            <div className="w-75">
-              <table className="table">
-                <thead>
+            <div className="w-50 mx-auto">
+              <table className="table  ">
+                <thead >
                   <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Actions</th>
@@ -126,7 +126,7 @@ const CreateCategory = () => {
                             Edit
                           </button>
                           <button
-                            className="btn btn-danger ms-3"
+                            className="btn btn-danger ms-2"
                             onClick={() => handleDelete(c._id, c.name)}
                           >
                             Delete

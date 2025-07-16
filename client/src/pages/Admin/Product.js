@@ -25,7 +25,7 @@ const Product = () => {
 
   return (
     <Layout title={"Dashboard - All Products"}>
-      <div className="container mt-4">
+      <div className="container-fluid m-3 p-3">
         <div className="row">
           {/* Sidebar Section */}
           <div className="col-md-3 mb-3">
