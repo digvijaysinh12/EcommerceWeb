@@ -22,193 +22,121 @@ const Header = () => {
   };
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        alignItems: "center",
-        padding: "10px 20px",
-        borderBottom: "1px solid #ddd",
-        backgroundColor: "#f8f9fa",
-        flexWrap: "wrap",
-        gap: "15px",
-      }}
-    >
-      {/* Brand */}
-      <NavLink
-        to="/"
-        style={{
-          fontWeight: "bold",
-          fontSize: "20px",
-          color: "#333",
-          textDecoration: "none",
-          marginRight: "auto",
-        }}
-      >
-        🛒 ECOMMERCE APP
-      </NavLink>
-
-      {/* Search */}
-      <div style={{ flexGrow: 1, minWidth: "200px" }}>
-        <Search />
-      </div>
-
-      {/* Navigation Links */}
-      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-        <NavLink
-          to="/"
-          style={({ isActive }) => ({
-            color: isActive ? "#007bff" : "#555",
-            textDecoration: "none",
-            fontWeight: isActive ? "600" : "400",
-          })}
-        >
-          HOME
+    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+      <div className="container">
+        {/* Brand */}
+        <NavLink className="navbar-brand fw-bold text-primary" to="/">
+          🛒 E-Shop
         </NavLink>
 
-        {/* Simple category dropdown */}
-        <div style={{ position: "relative" }}>
-          <span
-            style={{
-              cursor: "pointer",
-              color: "#555",
-              fontWeight: "500",
-              userSelect: "none",
-            }}
-            onClick={() => {
-              const menu = document.getElementById("category-menu");
-              if (menu.style.display === "block") {
-                menu.style.display = "none";
-              } else {
-                menu.style.display = "block";
-              }
-            }}
-          >
-            CATEGORY ▼
-          </span>
-          <div
-            id="category-menu"
-            style={{
-              position: "absolute",
-              top: "25px",
-              left: 0,
-              backgroundColor: "white",
-              border: "1px solid #ccc",
-              padding: "10px",
-              display: "none",
-              zIndex: 100,
-              minWidth: "150px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            }}
-            onMouseLeave={() => {
-              document.getElementById("category-menu").style.display = "none";
-            }}
-          >
-            <NavLink
-              to="/categories"
-              style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
-              onClick={() => (document.getElementById("category-menu").style.display = "none")}
-            >
-              All Categories
-            </NavLink>
-            {categories.map((c) => (
-              <NavLink
-                key={c.id}
-                to={"/category/" + c.slug}
-                style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
-                onClick={() => (document.getElementById("category-menu").style.display = "none")}
-              >
-                {c.name}
-              </NavLink>
-            ))}
-          </div>
-        </div>
+        {/* Toggle for mobile */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-        {/* Auth Links */}
-        {auth.user === null || auth.user === undefined ? (
-          <>
-            <NavLink
-              to="/register"
-              style={({ isActive }) => ({
-                color: isActive ? "#007bff" : "#555",
-                textDecoration: "none",
-              })}
-            >
-              REGISTER
-            </NavLink>
-            <NavLink
-              to="/login"
-              style={({ isActive }) => ({
-                color: isActive ? "#007bff" : "#555",
-                textDecoration: "none",
-              })}
-            >
-              LOGIN
-            </NavLink>
-          </>
-        ) : (
-          <div style={{ position: "relative" }}>
-            <span
-              style={{ cursor: "pointer", color: "#555", fontWeight: "500" }}
-              onClick={() => {
-                const menu = document.getElementById("user-menu");
-                if (menu.style.display === "block") {
-                  menu.style.display = "none";
-                } else {
-                  menu.style.display = "block";
-                }
-              }}
-            >
-              {auth.user.name} ▼
-            </span>
-            <div
-              id="user-menu"
-              style={{
-                position: "absolute",
-                top: "25px",
-                right: 0,
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                padding: "10px",
-                display: "none",
-                zIndex: 100,
-                minWidth: "120px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-              onMouseLeave={() => {
-                document.getElementById("user-menu").style.display = "none";
-              }}
-            >
-              <NavLink
-                to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
-                style={{ display: "block", padding: "5px 0", color: "#333", textDecoration: "none" }}
-                onClick={() => (document.getElementById("user-menu").style.display = "none")}
-              >
-                DASHBOARD
+        {/* Navbar content */}
+        <div className="collapse navbar-collapse" id="navbarContent">
+          {/* Search */}
+          <div className="mx-auto my-2 my-lg-0 w-100 w-lg-50 px-lg-3">
+            <Search />
+          </div>
+
+          {/* Right side links */}
+          <ul className="navbar-nav ms-auto align-items-center gap-2">
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/">
+                Home
               </NavLink>
+            </li>
+
+            {/* Categories Dropdown */}
+            <li className="nav-item dropdown">
               <span
-                style={{ display: "block", padding: "5px 0", cursor: "pointer", color: "#333" }}
-                onClick={handleLogout}
+                className="nav-link dropdown-toggle"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
-                LOGOUT
+                Categories
               </span>
-            </div>
-          </div>
-        )}
+              <ul className="dropdown-menu">
+                <li>
+                  <NavLink className="dropdown-item" to="/categories">
+                    All Categories
+                  </NavLink>
+                </li>
+                {categories.map((c) => (
+                  <li key={c.id}>
+                    <NavLink className="dropdown-item" to={`/category/${c.slug}`}>
+                      {c.name}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </li>
 
-        {/* Cart */}
-        <NavLink
-          to="/cart"
-          style={{
-            backgroundColor: "#007bff",
-            color: "white",
-            padding: "6px 12px",
-            borderRadius: "4px",
-            textDecoration: "none",
-            fontWeight: "600",
-          }}
-        >
-          CART ({cart.length})
-        </NavLink>
+            {/* Auth Links */}
+            {!auth.user ? (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/register">
+                    Register
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/login">
+                    Login
+                  </NavLink>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item dropdown">
+                <span
+                  className="nav-link dropdown-toggle"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {auth.user.name}
+                </span>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <NavLink
+                      className="dropdown-item"
+                      to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                    >
+                      Dashboard
+                    </NavLink>
+                  </li>
+                  <li>
+                    <span
+                      className="dropdown-item"
+                      role="button"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </span>
+                  </li>
+                </ul>
+              </li>
+            )}
+
+            {/* Cart */}
+            <li className="nav-item">
+              <NavLink className="btn btn-outline-primary position-relative" to="/cart">
+                Cart
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {cart.length}
+                </span>
+              </NavLink>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );

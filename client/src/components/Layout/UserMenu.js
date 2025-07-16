@@ -9,10 +9,11 @@ const UserMenu = () => {
   return (
     <Layout>
       <div className="text-center">
-        <div className="list-group">
-          <NavLink to="/dashboard/user" className={getLinkClass}>
+           <NavLink to="/dashboard/user" className="text-decoration-none text-color-white">
             <h4>Dashboard</h4>
           </NavLink>
+
+        <div className="list-group">
           <NavLink to="/dashboard/user/profile" className={getLinkClass}>
             Profile
           </NavLink>
