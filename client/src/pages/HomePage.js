@@ -8,6 +8,7 @@ import { useCart } from "../context/cart";
 import { toast } from "react-toastify";
 
 const HomePage = () => {
+  const api = process.env.REACT_APP_API;
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [checkedCategories, setCheckedCategories] = useState([]);
@@ -37,6 +38,8 @@ const HomePage = () => {
   // Load more products when page changes (except page 1)
   useEffect(() => {
     if (page > 1) loadMoreProducts(page);
+        console.log("backendurl",api);
+
   }, [page]);
 
   // Fetch categories from API
@@ -177,13 +180,16 @@ const HomePage = () => {
 
             <div className="row g-4">
               {products.map((p) => (
-                <div key={p._id} className="col-sm-6 col-lg-4">
+                <div key={p._id} className="col-12 col-sm-6 col-md-4 col-lg-3">
                   <div className="card product-card h-100 shadow-sm">
-                    <img
-                      src={`/api/v1/product/product-photo/${p._id}`}
-                      alt={p.name}
-                      className="card-img-top product-img"
-                    />
+<img
+  src={`/api/v1/product/product-photo/${p._id}`}
+  alt={p.name}
+  className="card-img-top img-fluid"
+  style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+/>
+
+
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{p.name}</h5>
                       <p className="card-text text-muted">{p.description.substring(0, 60)}...</p>
