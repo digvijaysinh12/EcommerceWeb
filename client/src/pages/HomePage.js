@@ -8,7 +8,6 @@ import { useCart } from "../context/cart";
 import { toast } from "react-toastify";
 
 const HomePage = () => {
-  const api = process.env.REACT_APP_API;
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [checkedCategories, setCheckedCategories] = useState([]);
@@ -38,7 +37,6 @@ const HomePage = () => {
   // Load more products when page changes (except page 1)
   useEffect(() => {
     if (page > 1) loadMoreProducts(page);
-        console.log("backendurl",api);
 
   }, [page]);
 
