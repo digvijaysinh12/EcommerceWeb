@@ -1,44 +1,84 @@
-import express from 'express';
-import {registerController,loginController, testController, forgotPasswordController, updateProfileController, getOrderController, sendOTP, getAllOrderController, orderStatusController} from '../controllers/authController.js'
-import {isAdmin, requireSignIn} from '../middleware/authMiddleware.js'
-//router object
+/************************************************************
+ * AUTH ROUTES (Express Router)
+ * ----------------------------------------------------------
+ * WHAT IS THIS?
+ * - Defines all routes related to authentication, authorization,
+ *   user profile, and order management.
+ *
+ * WHY DO WE NEED IT?
+ * - To separate route handling from main server file (cleaner code).
+ * - To manage user login, registration, password reset, and role-based access.
+ *
+ * WHAT IT DOES?
+ * - Registers users & handles login
+ * - Supports password recovery (via OTP)
+ * - Provides role-based access (user vs admin)
+ * - Allows profile updates
+ * - Fetches user orders & admin orders
+ * - Updates order status (admin only)
+ ************************************************************/
+
+import express from "express";
+import {
+  registerController,
+  loginController,
+  testController,
+  forgotPasswordController,
+  updateProfileController,
+  getOrderController,
+  sendOTP,
+  getAllOrderController,
+  orderStatusController,
+} from "../controllers/authController.js";
+
+import { isAdmin, requireSignIn } from "../middleware/authMiddleware.js";
+
+// ----------------- ROUTER OBJECT -----------------
 const router = express.Router();
 
-//routing   
-//REGISTER || METHOD POST
-router.post('/register' , registerController);
-//SEND OTP
-router.post('/send-otp',sendOTP);
+// ----------------- AUTH ROUTES -----------------
 
+// REGISTER || POST
+router.post("/register", registerController);
 
-//LOGIN || METHOD POST
-router.post('/login', loginController);
+// SEND OTP (for verification or password reset)
+router.post("/send-otp", sendOTP);
 
-//FORGOT PASSWORD || METHOD POST
-router.post('/forgot-password', forgotPasswordController);
+// LOGIN || POST
+router.post("/login", loginController);
 
-//TEST || ROUTES
-router.get('/test',requireSignIn,isAdmin,testController);
+// FORGOT PASSWORD || POST
+router.post("/forgot-password", forgotPasswordController);
 
-//PROTECTED ROUTE FOR AUTHENTICATION
-router.get('/user-auth' , requireSignIn, (req,res) => {
-    res.status(200).send({ok:true});
-})
+// ----------------- TEST & AUTH CHECK ROUTES -----------------
 
-//PROTECTED ROUTE FOR ADMIN PAGE
-router.get('/user-admin' , requireSignIn, isAdmin, (req, res) => {
-    res.status(200).send({ok:true});
-})
+// TEST (Protected, Admin only)
+router.get("/test", requireSignIn, isAdmin, testController);
 
-//UPDATE PROFILE
-router.put("/profile",requireSignIn,updateProfileController);
+// USER AUTH CHECK (Protected route)
+router.get("/user-auth", requireSignIn, (req, res) => {
+  res.status(200).send({ ok: true });
+});
 
-//ORDERS
-router.get('/orders',requireSignIn, getOrderController);
+// ADMIN AUTH CHECK (Protected, Admin only)
+router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
+  res.status(200).send({ ok: true });
+});
 
-router.get('/all-orders',requireSignIn,isAdmin,getAllOrderController);
+// ----------------- USER PROFILE -----------------
 
-// ORDER STATUS UPDATE
+// UPDATE PROFILE || PUT
+router.put("/profile", requireSignIn, updateProfileController);
+
+// ----------------- ORDERS -----------------
+
+// GET USER ORDERS
+router.get("/orders", requireSignIn, getOrderController);
+
+// GET ALL ORDERS (Admin only)
+router.get("/all-orders", requireSignIn, isAdmin, getAllOrderController);
+
+// UPDATE ORDER STATUS (Admin only)
 router.put(
   "/order-status/:orderId",
   requireSignIn,
@@ -46,4 +86,6 @@ router.put(
   orderStatusController
 );
 
+// ----------------- EXPORT ROUTER -----------------
 export default router;
+

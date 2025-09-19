@@ -1,44 +1,69 @@
+/************************************************************
+ * E-COMMERCE BACKEND SERVER (Express + MongoDB)
+ * ----------------------------------------------------------
+ * This file serves as the main entry point of the backend
+ * application for the E-Commerce platform.
+ *
+ * WHY WE NEED THIS FILE?
+ * - Centralized configuration for server, database, routes.
+ * - Connects to MongoDB and initializes API endpoints.
+ *
+ * WHAT IT DOES?
+ * - Initializes Express app
+ * - Loads environment variables
+ * - Uses middlewares (CORS, Morgan, JSON parser)
+ * - Mounts API routes (Auth, Category, Product)
+ * - Starts the server
+ ************************************************************/
+
+// ----------------- IMPORT DEPENDENCIES -----------------
 import express from "express";
-import colors from "colors";
-import dotenv from "dotenv";
-import mongan from 'morgan'
-import connectDB from "./config/db.js";
-import morgan from "morgan";
-import authRoute from './routes/authRoute.js'
-import categoryRoutes from './routes/categoryRoutes.js'
-import productRoutes from './routes/productRoutes.js'
-import cors from 'cors';
+import dotenv from "dotenv";          // To load environment variables
+import morgan from "morgan";          // For HTTP request logging
+import cors from "cors";              // To handle cross-origin requests
 
-//configure env
-dotenv.config();
+// ----------------- CUSTOM MODULES -----------------
+import connectDB from "./config/db.js";             // MongoDB connection setup
+import authRoute from "./routes/authRoute.js";      // Authentication routes
+import categoryRoutes from "./routes/categoryRoutes.js"; // Category routes
+import productRoutes from "./routes/productRoutes.js";   // Product routes
 
-//database config
+// ----------------- CONFIGURATION -----------------
+dotenv.config(); // Load environment variables from .env
+
+// Connect to the database
 connectDB();
 
-//rest object
+// Create express app instance
 const app = express();
 
-//middelware
-app.use(cors({ origin: 'http://localhost:3000' }));
+// ----------------- MIDDLEWARE -----------------
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, // ✅ dynamically from .env
+    credentials: true,              // allow cookies if needed
+  })
+);
 
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(express.json()); // Parse incoming JSON requests
+app.use(morgan("dev"));  // Log HTTP requests
 
-//routes
-app.use("/api/v1/auth",authRoute);
-app.use("/api/v1/category",categoryRoutes);
-app.use("/api/v1/product",productRoutes);
+// ----------------- ROUTES -----------------
+app.use("/api/v1/auth", authRoute);          // Authentication APIs
+app.use("/api/v1/category", categoryRoutes); // Category APIs
+app.use("/api/v1/product", productRoutes);   // Product APIs
 
-//rest api
-app.get('/',(req,res) => {
-    res.send("<h1>Welcome to Ecommerce App</h1>")
-})
+// Default test route
+app.get("/", (req, res) => {
+  res.send("<h1>Welcome to Ecommerce App Backend</h1>");
+});
 
-//PORT
+// ----------------- SERVER SETUP -----------------
 const PORT = process.env.PORT || 8080;
 
-//run listen
 app.listen(PORT, () => {
-    console.log(`Server Running on ${process.env.DEV_MODE} mode on ${PORT}` .black.bold .bgWhite);
+  console.log(
+    `✅ Server running in ${process.env.DEV_MODE} mode on port ${PORT}`
+  );
 });
 

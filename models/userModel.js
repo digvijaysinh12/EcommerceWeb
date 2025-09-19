@@ -1,39 +1,76 @@
-import mongoose  from "mongoose";
+/************************************************************
+ * USER MODEL (Mongoose Schema)
+ * ----------------------------------------------------------
+ * WHAT IS THIS?
+ * - Defines the structure of the "User" document inside MongoDB.
+ * - Acts like a blueprint for storing user data in the database.
+ *
+ * WHY DO WE NEED IT?
+ * - To ensure consistent data format (name, email, password, etc.).
+ * - To enforce validations (required fields, unique values).
+ * - To extend features (timestamps, roles, authentication).
+ *
+ * WHAT IT DOES?
+ * - Creates a schema for User with fields: name, email, password,
+ *   phone, address, security question, and role.
+ * - Exports a Mongoose model that can be used for CRUD operations.
+ ************************************************************/
 
-const userSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true
+import mongoose from "mongoose";
+
+// ----------------- USER SCHEMA -----------------
+const userSchema = new mongoose.Schema(
+  {
+    // User's full name
+    name: {
+      type: String,
+      required: true,
+      trim: true, // removes extra spaces
     },
-    email:{
-        type:String,
-        require:true,
-        unique:true
+
+    // User's email (must be unique for login)
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true, // store in lowercase for consistency
     },
-    password:{
-        type:String,
-        required:true,
-        unique:true
+
+    // Encrypted password (never store plain text!)
+    password: {
+      type: String,
+      required: true,
     },
-    phone:{
-        type:Number,
-        require:true
+
+    // Contact number
+    phone: {
+      type: Number,
+      required: true,
     },
-    address:{
-        type:String,
-        required:true
+
+    // User's address
+    address: {
+      type: String,
+      required: true,
     },
-    quetion:{
-        type:String,
-        require:true
-    }   ,
-    role:{
-        type:Number,
-        default:0
+
+    // Security question (for password recovery)
+    question: {
+      type: String,
+      required: true,
     },
-},
-    {timestamps:true}
+
+    // Role → 0 = Normal User, 1 = Admin
+    role: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    timestamps: true, // adds createdAt & updatedAt fields automatically
+  }
 );
 
-export default mongoose.model('users',userSchema);
+// ----------------- EXPORT MODEL -----------------
+export default mongoose.model("User", userSchema);
+
