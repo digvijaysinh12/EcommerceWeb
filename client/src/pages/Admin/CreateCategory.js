@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./../../components/Layout/Layout";
-import AdminMenu from "./../../components/Layout/AdminMenu";
+import Layout from "../../components/Layout/Layout";
+import AdminMenu from "../../components/Layout/AdminMenu";
 import { toast } from "react-toastify";
 import axios from "axios";
 import 'antd/dist/reset.css';

@@ -12,7 +12,7 @@ export default function AdminRoute() {
     const authCheck = async () => {
       try {
         console.log("Making request to check admin status...");
-        const res = await axios.get("/api/v1/auth/user-admin");
+        const res = await axios.get("/api/v1/auth/admin-auth");
         
         console.log("Response from /user-admin API:", res.data);
 

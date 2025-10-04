@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Layout from "../components/Layout/Layout";
+import Layout from "../../components/Layout/Layout";
 import axios from "axios";
 import { Radio } from "antd";
 import { Prices } from "./Prices";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/cart";
+import { useCart } from "../../context/cart";
 import { toast } from "react-toastify";
 
-const HomePage = () => {
+const Home = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [checkedCategories, setCheckedCategories] = useState([]);
@@ -232,4 +232,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Home;

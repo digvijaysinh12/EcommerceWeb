@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminMenu from "../../components/Layout/AdminMenu";
+import AdminMenu from "../../components/Layout/AdminMenu.js";
 import Layout from "../../components/Layout/Layout.js";
 import { toast } from "react-toastify";
 import axios from "axios";

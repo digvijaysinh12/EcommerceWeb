@@ -7,7 +7,7 @@ import moment from "moment";
 import { Select } from "antd";
 const { Option } = Select;
 
-const AdminOrders = () => {
+const Orders = () => {
   const [status, setStatus] = useState([
     "Not Process",
     "Processing",
@@ -123,4 +123,4 @@ const AdminOrders = () => {
   )
 }
 
-export default AdminOrders;
+export default Orders;

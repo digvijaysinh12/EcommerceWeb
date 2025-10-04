@@ -1,6 +1,6 @@
-import Layout from '../components/Layout/Layout'
+import Layout from '../../components/Layout/Layout'
 import React, { useState } from 'react'
-import { useSearch } from '../context/search';
+import { useSearch } from '../../context/search';
 import { Link } from 'react-scroll';
 
 const Search = () => {

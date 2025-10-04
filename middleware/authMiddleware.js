@@ -61,6 +61,7 @@ export const requireSignIn = async (req, res, next) => {
  */
 export const isAdmin = async (req, res, next) => {
   try {
+    console.log(req);
     const user = await userModel.findById(req.user._id);
 
     if (!user) {

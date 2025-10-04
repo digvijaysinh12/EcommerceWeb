@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../components/Layout/Layout';
+import Layout from '../../components/Layout/Layout';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';

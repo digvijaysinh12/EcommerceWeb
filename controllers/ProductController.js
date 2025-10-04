@@ -8,7 +8,6 @@ import braintree from "braintree";
 import orderModel from "../models/orderModel.js";
 
 dotenv.config();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //payment gateway
 var gateway = new braintree.BraintreeGateway({
@@ -73,7 +72,7 @@ export const createProductController = async (req, res) => {
 
 export const getProductCotroller = async (req, res) => {
     try {
-        const products = await productModel.find({}).populate('category').select("-photo").limit(12).sort({ createdAt: -1 })
+        const products = await productModel.find({}).populate('category').select("-photo").limit(16).sort({ createdAt: -1 })
         res.status(200).send({
             success: true,
             message: "All Products",
@@ -283,7 +282,7 @@ export const productCountController = async (req, res) => {
 //product list base on page
 export const productListController = async (req, res) => {
     try {
-        const perPage = 6
+        const perPage = 8
         const page = req.params.page ? req.params.page : 1
         const products = await productModel
             .find({})
