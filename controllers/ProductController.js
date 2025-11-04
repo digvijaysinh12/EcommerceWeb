@@ -2,7 +2,6 @@ import productModel from "../models/productModel.js";
 import categoryModel from '../models/categoryModel.js'
 import fs from 'fs';
 import slugify from "slugify";
-import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import braintree from "braintree";
 import orderModel from "../models/orderModel.js";
@@ -16,58 +15,64 @@ var gateway = new braintree.BraintreeGateway({
   publicKey: process.env.BRAINTREE_PUBLIC_KEY,
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 });
+
 export const createProductController = async (req, res) => {
-    try {
-        const { name, slug, description, price, category, shipping, quantity } = req.fields;
-        const { photo } = req.files;
+  try {
+    const { name, slug, description, price, category, shipping, quantity } = req.fields;
+    const { photo } = req.files;
 
-        // Validate required fields
-        if (!name) return res.status(400).send({ error: 'Name is required' });
-        if (!slug && !name) return res.status(400).send({ error: 'Slug is required or Name should be provided to generate one' });
-        if (!description) return res.status(400).send({ error: 'Description is required' });
-        if (!category) return res.status(400).send({ error: 'Category is required' });
-        if (!price) return res.status(400).send({ error: 'Price is required' });
-        if (!quantity) return res.status(400).send({ error: 'Quantity is required' });
+    // ---------------- VALIDATION ----------------
+    if (!name) return res.status(400).send({ error: "Name is required" });
+    if (!description) return res.status(400).send({ error: "Description is required" });
+    if (!category) return res.status(400).send({ error: "Category is required" });
+    if (!price) return res.status(400).send({ error: "Price is required" });
+    if (!quantity) return res.status(400).send({ error: "Quantity is required" });
 
-        // Validate photo size
-        if (photo && photo.size > 1000000) { // 1MB in bytes
-            return res.status(400).send({ error: 'Photo is required and should be less than 1 MB' });
-        }
-
-        // Generate slug if not provided
-        const slugToUse = slug || slugify(name);
-
-        // Create new product instance
-        const product = new productModel({
-            ...req.fields,
-            slug: slugToUse
-        });
-
-        // Handle photo upload
-        if (photo) {
-            product.photo.data = fs.readFileSync(photo.path);
-            product.photo.contentType = photo.type;
-        }
-
-        // Save the product
-        await product.save();
-
-        // Send success response
-        res.status(201).send({
-            success: true,
-            message: 'Product Created Successfully',
-            product
-
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({
-            success: false,
-            message: 'Error in Product Creation',
-            error: error.message
-        });
+    // Validate photo size (limit: 1MB)
+    if (photo && photo.size > 1000000) {
+      return res.status(400).send({
+        error: "Photo should be less than 1 MB",
+      });
     }
+
+    // ---------------- FIX: Convert shipping to Boolean ----------------
+    const isShipping = shipping === "Yes" || shipping === true || shipping === "true";
+
+    // ---------------- CREATE PRODUCT ----------------
+    const product = new productModel({
+      name,
+      slug: slug || slugify(name),
+      description,
+      price,
+      category,
+      quantity,
+      shipping: isShipping, // ✅ fixed conversion
+    });
+
+    // ---------------- PHOTO HANDLING ----------------
+    if (photo) {
+      product.photo.data = fs.readFileSync(photo.path);
+      product.photo.contentType = photo.type;
+    }
+
+    await product.save();
+
+    // ---------------- RESPONSE ----------------
+    res.status(201).send({
+      success: true,
+      message: "Product Created Successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("❌ Error in Product Creation:", error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Product Creation",
+      error: error.message,
+    });
+  }
 };
+
 
 
 export const getProductCotroller = async (req, res) => {
@@ -95,7 +100,7 @@ export const getSingleProductController = async (req, res) => {
         const product = await productModel.findOne({ slug: req.params.slug })
             .select("-photo")//Exclude photo from the response
             .populate("category");//Populate the 'category' field
-
+        console.log(product);
         // If no product is found, send a 404 error
         if (!product) {
             return res.status(404).send({

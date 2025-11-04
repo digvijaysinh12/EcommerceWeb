@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react'
-import Layout from '../../components/Layout/Layout';
-import AdminMenu from '../../components/Layout/AdminMenu';
-import axios from 'axios';
-import { useAuth } from '../../context/auth';
+import React, { useEffect, useState, lazy, Suspense } from "react";
+import Layout from "../../components/Layout/Layout";
+import { useAuth } from "../../context/AuthContext";
+import axios from "axios";
 import moment from "moment";
 import { Select } from "antd";
+
 const { Option } = Select;
+// Lazy load AdminMenu
+const AdminMenu = lazy(() => import("../../components/Layout/AdminMenu"));
 
 const Orders = () => {
-  const [status, setStatus] = useState([
+  const BASE_URL = process.env.REACT_APP_API_URL;
+  const [status] = useState([
     "Not Process",
     "Processing",
     "Shipped",
-    "deliverd",
-    "cancel",
+    "Delivered",
+    "Cancel",
   ]);
-  const [changeStatus, setCHangeStatus] = useState("");
   const [orders, setOrders] = useState([]);
-  const [auth, setAuth] = useAuth();
+  const [auth] = useAuth();
+
+  // Fetch all orders
   const getOrders = async () => {
     try {
-      const { data } = await axios.get("/api/v1/auth/all-orders");
-      setOrders(data);
+      const { data } = await axios.get(`${BASE_URL}/api/v1/auth/all-orders`);
+      setOrders(data || []);
     } catch (error) {
       console.log(error);
     }
@@ -31,9 +35,10 @@ const Orders = () => {
     if (auth?.token) getOrders();
   }, [auth?.token]);
 
+  // Update order status
   const handleChange = async (orderId, value) => {
     try {
-      const { data } = await axios.put(`/api/v1/auth/order-status/${orderId}`, {
+      await axios.put(`${BASE_URL}/api/v1/auth/order-status/${orderId}`, {
         status: value,
       });
       getOrders();
@@ -41,86 +46,107 @@ const Orders = () => {
       console.log(error);
     }
   };
-  
+
   return (
-    <>
-      <Layout title={"Dashboard - All Orders"}>
-      <div className="container-fluid m-3 p-3">
-        <div className="row">
-          {/* Sidebar Section */}
-          <div className="col-md-3 mb-3">
-            <AdminMenu />
+    <Layout title="Dashboard - All Orders">
+      <div className="container mx-auto p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar */}
+          <div className="lg:w-1/4">
+            <Suspense
+              fallback={<div className="text-center text-gray-500">Loading menu...</div>}
+            >
+              <AdminMenu />
+            </Suspense>
           </div>
 
-          {/* Product List Section */}
-          <div className="col-md-9">
-          <h1 className="text-center">All Orders</h1>
-          {orders?.map((o, i) => {
-            return (
-              <div className="border shadow">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Buyer</th>
-                      <th scope="col"> date</th>
-                      <th scope="col">Payment</th>
-                      <th scope="col">Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{i + 1}</td>
-                      <td>
-                        <Select
-                          bordered={false}
-                          onChange={(value) => handleChange(o._id, value)}
-                          defaultValue={o?.status}
-                        >
-                          {status.map((s, i) => (
-                            <Option key={i} value={s}>
-                              {s}
-                            </Option>
-                          ))}
-                        </Select>
-                      </td>
-                      <td>{o?.buyer?.name}</td>
-                      <td>{moment(o?.createAt).fromNow()}</td>
-                      <td>{o?.payment.success ? "Success" : "Failed"}</td>
-                      <td>{o?.products?.length}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div className="container">
-                  {o?.products?.map((p, i) => (
-                    <div className="row mb-2 p-3 card flex-row" key={p._id}>
-                      <div className="col-md-4">
-                        <img
-                          src={`/api/v1/product/product-photo/${p._id}`}
-                          className="card-img-top"
-                          alt={p.name}
-                          width="100px"
-                          height={"100px"}
-                        />
-                      </div>
-                      <div className="col-md-8">
-                        <p>{p.name}</p>
-                        <p>{p.description.substring(0, 30)}</p>
-                        <p>Price : {p.price}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {/* Orders Section */}
+          <div className="lg:w-3/4 space-y-6">
+            <h1 className="text-2xl font-bold text-center mb-4">All Orders</h1>
+
+            {orders.length === 0 ? (
+              <div className="text-center text-red-500 font-semibold py-10">
+                No orders found
               </div>
-            );
-          })}
+            ) : (
+              orders.map((o, i) => (
+                <div key={o._id} className="bg-white shadow-md rounded-lg p-6">
+                  {/* Order Info Table */}
+                  <div className="overflow-x-auto mb-4">
+                    <table className="min-w-full text-left border border-gray-200 divide-y divide-gray-200">
+                      <thead className="bg-indigo-600 text-white">
+                        <tr>
+                          <th className="px-4 py-2">#</th>
+                          <th className="px-4 py-2">Status</th>
+                          <th className="px-4 py-2">Buyer</th>
+                          <th className="px-4 py-2">Date</th>
+                          <th className="px-4 py-2">Payment</th>
+                          <th className="px-4 py-2">Quantity</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="px-4 py-2">{i + 1}</td>
+                          <td className="px-4 py-2">
+                            <Select
+                              bordered={false}
+                              defaultValue={o?.status}
+                              onChange={(value) => handleChange(o._id, value)}
+                              className="w-full"
+                            >
+                              {status.map((s, i) => (
+                                <Option key={i} value={s}>
+                                  {s}
+                                </Option>
+                              ))}
+                            </Select>
+                          </td>
+                          <td className="px-4 py-2">{o?.buyer?.name}</td>
+                          <td className="px-4 py-2">
+                            {moment(o?.createdAt).fromNow()}
+                          </td>
+                          <td className="px-4 py-2">
+                            {o?.payment?.success ? "Success" : "Failed"}
+                          </td>
+                          <td className="px-4 py-2">{o?.products?.length}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Products in Order */}
+                  <div className="space-y-4">
+                    {o?.products?.map((p) => (
+                      <div
+                        key={p._id}
+                        className="flex flex-col sm:flex-row items-center sm:items-start border rounded-lg p-3 bg-gray-50"
+                      >
+                        <img
+                          src={`${BASE_URL}/api/v1/product/product-photo/${p._id}`}
+                          alt={p.name}
+                          className="w-24 h-24 object-cover rounded mb-2 sm:mb-0 sm:mr-4"
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/100?text=No+Image";
+                          }}
+                        />
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{p.name}</p>
+                          <p className="text-gray-600 text-sm">
+                            {p.description.slice(0, 50)}...
+                          </p>
+                          <p className="text-gray-700 font-medium mt-1">Price: ${p.price}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
-      </Layout>
-    </>
-  )
-}
+    </Layout>
+  );
+};
 
 export default Orders;

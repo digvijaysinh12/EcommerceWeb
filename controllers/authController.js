@@ -3,7 +3,7 @@ import { hashPassword, comparePassword } from "../helpers/authHelper.js";
 import userModel from "../models/userModel.js";
 import JWT from "jsonwebtoken";
 import orderModel from "../models/orderModel.js";
-import otpGeneraotor from "otp-generator"
+import otpGenerator from "otp-generator";
 import nodemailer from "nodemailer";
 
 export const registerController = async (req, res) => {
@@ -56,58 +56,83 @@ export const registerController = async (req, res) => {
         })
     }
 }
-const otpStore = {};
+
+const otpStore = {}; // temporary in-memory store
+
 export const sendOTP = async (req, res) => {
-    try {
-        const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-        if (!email) return res.status(400).json({ message: "Email is required" });
-
-        const otp = otpGeneraotor.generate(6, { digits: true, alphabets: false });
-        otpStore[email] = otp;
-
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.USER,
-                pass: process.env.PASS,
-            },
-        })
-
-        const mailOptions = {
-            from: '"SmartPhone App" <process.env.USER>',
-            to: email,
-            subject: "Email Verification OTP",
-            text: `Your OTP for verification is ${otp}. It is valid fot t minutes.`,
-        };
-        try {
-            await transporter.sendMail(mailOptions);
-            res.status(200).json({ success: true, message: "OTP sent to email" });
-        } catch (err) {
-            res.status(500).json({ success: false, message: "Failed to send email", error: err.message });
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            success: false,
-            message: 'Error in Sending OTP',
-            error: error,
-        })
+    if (!email) {
+      console.log("❌ Email not provided");
+      return res.status(400).json({ message: "Email is required" });
     }
-}
 
-export const verifyOTP = async(req,res) => {
-    const {email,otp} = req.body;
-    if(otpStore[email] && otpStore[email] === otp){
-        delete otpStore[email];
-        return res.status(200).json({success:true, message : "OTP verified successfully"});
-    }else{
-        return res.status(400).json({
-            success: false,
-            message: "Invalid or expired OTP"
-        });
+    // Generate OTP
+    const otp = otpGenerator.generate(6, { digits: true, alphabets: false });
+    otpStore[email] = otp;
+    console.log(`✅ Generated OTP for ${email}: ${otp}`);
+
+    // Check env vars
+    if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
+      console.error("❌ Missing MAIL_USER or MAIL_PASS in .env");
+      return res.status(500).json({ message: "Email configuration error" });
     }
-}
+
+    // ✅ FIXED: use MAIL_USER for user, MAIL_PASS for pass
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MAIL_USER, // correct
+        pass: process.env.MAIL_PASS, // app password from Google
+      },
+    });
+
+    const mailOptions = {
+      from: `"SmartPhone App" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject: "Email Verification OTP",
+      text: `Your OTP for verification is ${otp}. It is valid for 10 minutes.`,
+    };
+
+    console.log("📤 Sending OTP email...");
+
+    await transporter.sendMail(mailOptions);
+
+    console.log(`✅ OTP sent successfully to ${email}`);
+    res.status(200).json({ success: true, message: "OTP sent to email" });
+  } catch (error) {
+    console.error("❌ Error in sendOTP:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error in Sending OTP",
+      error: error.message,
+    });
+  }
+};
+
+
+export const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  console.log("📩 Email received:", email);
+  console.log("🔢 OTP received:", otp);
+  console.log("🧠 Stored OTP:", otpStore[email]);
+
+  if (otpStore[email] && otpStore[email] === otp) {
+    delete otpStore[email];
+    console.log("✅ OTP verified successfully");
+    return res.status(200).json({ success: true, message: "OTP verified successfully" });
+  } else {
+    console.log("❌ Invalid or expired OTP");
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or expired OTP",
+    });
+  }
+};
+
+
 export const loginController = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -286,4 +311,19 @@ export const orderStatusController = async (req, res) => {
       error,
     });
   }
-};
+}
+
+// Get All users
+export  const getAllUsersController = async (req,res) => {
+    try{
+        const users = await userModel.find();
+        console.log(users);
+        res.json({users});
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error While Getting All Users"
+        })
+    }
+}

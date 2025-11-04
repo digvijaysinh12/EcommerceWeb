@@ -29,6 +29,8 @@ import {
   sendOTP,
   getAllOrderController,
   orderStatusController,
+  getAllUsersController,
+  verifyOTP,
 } from "../controllers/authController.js";
 
 import { isAdmin, requireSignIn } from "../middleware/authMiddleware.js";
@@ -43,6 +45,9 @@ router.post("/register", registerController);
 
 // SEND OTP (for verification or password reset)
 router.post("/send-otp", sendOTP);
+
+// VERIFY OTP (for email verification or password reset)
+router.post("/verify-otp", verifyOTP);
 
 // LOGIN || POST
 router.post("/login", loginController);
@@ -86,6 +91,14 @@ router.put(
   orderStatusController
 );
 
+// GET ALL USERS FOR USERS MANAGEMENT
+
+router.get(
+  "/all-users",
+  requireSignIn,
+  isAdmin,
+  getAllUsersController
+)
 // ----------------- EXPORT ROUTER -----------------
 export default router;
 

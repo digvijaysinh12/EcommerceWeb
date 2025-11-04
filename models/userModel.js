@@ -26,12 +26,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true, // removes extra spaces
+      maxlength:32,
     },
 
     // User's email (must be unique for login)
     email: {
       type: String,
       required: true,
+      trim:true,
+      index:{unique:true},
+      match:/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
       unique: true,
       lowercase: true, // store in lowercase for consistency
     },
@@ -57,7 +61,7 @@ const userSchema = new mongoose.Schema(
     // Security question (for password recovery)
     question: {
       type: String,
-      required: true,
+      required: false,
     },
 
     // Role → 0 = Normal User, 1 = Admin

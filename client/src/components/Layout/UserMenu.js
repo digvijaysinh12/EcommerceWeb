@@ -4,16 +4,16 @@ import { NavLink } from "react-router-dom";
 
 const UserMenu = () => {
   const getLinkClass = ({ isActive }) =>
-    `list-group-item list-group-item-action${isActive ? " active" : ""}`;
+    `list-group-item list-group-item-action text-decoration-none${isActive ? " active" : ""}`;
 
   return (
     <Layout>
       <div className="text-center">
-           <NavLink to="/dashboard/user" className="text-decoration-none text-color-white">
-            <h4>Dashboard</h4>
-          </NavLink>
+        <NavLink to="/dashboard/user" className="text-decoration-none text-white">
+          <h4>Dashboard</h4>
+        </NavLink>
 
-        <div className="list-group">
+        <div className="list-group mt-3">
           <NavLink to="/dashboard/user/profile" className={getLinkClass}>
             Profile
           </NavLink>

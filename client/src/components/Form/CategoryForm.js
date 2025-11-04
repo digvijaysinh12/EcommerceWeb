@@ -1,23 +1,28 @@
 import React from "react";
 
-const CategoryForm = ({ handleSubmit, value, setValue }) => {
-  
+const CategoryForm = ({ handleSubmit, value, setValue, disabled }) => {
   return (
-    <>
-<form>
-  <div class="mb-3 d-flex">
-    <input
-      type="text"
-      class="form-control me-2"
-      placeholder="Enter new category"
-    />
-    <button type="submit" class="btn btn-primary">
-      Submit
-    </button>
-  </div>
-</form>
-
-    </>
+    <form onSubmit={handleSubmit} autoComplete="off">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Enter category name"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="border p-2 rounded w-full"
+          required
+        />
+        <button
+          type="submit"
+          disabled={disabled}
+          className={`${
+            disabled ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
+          } text-white px-4 py-2 rounded transition`}
+        >
+          {disabled ? "Saving..." : "Submit"}
+        </button>
+      </div>
+    </form>
   );
 };
 

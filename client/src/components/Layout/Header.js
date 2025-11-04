@@ -1,144 +1,184 @@
-import React from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/auth";
-import { toast } from "react-toastify";
-import Search from "../Form/Search";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import useCategory from "../../hooks/useCategory";
-import { useCart } from "../../context/cart";
+import { toast } from "react-toastify";
+import { HiMenu, HiX, HiShoppingCart } from "react-icons/hi";
+import "./Header.css"
+
+const Search = lazy(() => import("../Form/Search"));
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
   const [cart] = useCart();
   const categories = useCategory();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     setAuth({ user: null, token: "" });
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000);
+    navigate("/login", { replace: true });
+    setMenuOpen(false);
   };
 
+  const renderCategories = () =>
+    categories?.map((c) => (
+      <NavLink
+        key={c._id}
+        to={`/category/${c.slug}`}
+        className="dropdown-link"
+        onClick={() => setMenuOpen(false)}
+      >
+        {c.name}
+      </NavLink>
+    ));
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-      <div className="container">
+    <header className="header">
+      <div className="header-container">
         {/* Brand */}
-        <NavLink className="navbar-brand fw-bold text-primary" to="/">
-          🛒 E-Shop
+        <NavLink to="/" className="brand">
+          🛍️ShopEasy
         </NavLink>
 
-        {/* Toggle for mobile */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        {/* Navbar content */}
-        <div className="collapse navbar-collapse" id="navbarContent">
-          {/* Search */}
-          <div className="mx-auto my-2 my-lg-0 w-100 w-lg-50 px-lg-3">
-            <Search />
+        {/* Desktop Menu */}
+        <div className="desktop-menu">
+          <div className="search-box">
+            <Suspense fallback={<div>Loading...</div>}>
+              <Search />
+            </Suspense>
           </div>
 
-          {/* Right side links */}
-          <ul className="navbar-nav ms-auto align-items-center gap-2">
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/">
-                Home
-              </NavLink>
-            </li>
+          <div className="nav-links">
+            <NavLink to="/" className="nav-item">
+              Home
+            </NavLink>
 
-            {/* Categories Dropdown */}
-            <li className="nav-item dropdown">
-              <span
-                className="nav-link dropdown-toggle"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Categories
-              </span>
-              <ul className="dropdown-menu">
-                <li>
-                  <NavLink className="dropdown-item" to="/categories">
-                    All Categories
-                  </NavLink>
-                </li>
-                {categories.map((c) => (
-                  <li key={c.id}>
-                    <NavLink className="dropdown-item" to={`/category/${c.slug}`}>
-                      {c.name}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </li>
+            <div className="dropdown">
+              <button className="dropdown-btn">Categories ▾</button>
+              <div className="dropdown-content">
+                <NavLink to="/categories" className="dropdown-link">
+                  All Categories
+                </NavLink>
+                {renderCategories()}
+              </div>
+            </div>
 
-            {/* Auth Links */}
-            {!auth.user ? (
+            {!auth?.user ? (
               <>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/register">
-                    Register
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/login">
-                    Login
-                  </NavLink>
-                </li>
+                <NavLink to="/register" className="nav-item">
+                  Register
+                </NavLink>
+                <NavLink to="/login" className="nav-item">
+                  Login
+                </NavLink>
               </>
             ) : (
-              <li className="nav-item dropdown">
-                <span
-                  className="nav-link dropdown-toggle"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {auth.user.name}
-                </span>
-                <ul className="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
-                    >
-                      Dashboard
-                    </NavLink>
-                  </li>
-                  <li>
-                    <span
-                      className="dropdown-item"
-                      role="button"
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </span>
-                  </li>
-                </ul>
-              </li>
+              <div className="dropdown">
+                <button className="dropdown-btn">{auth.user.name} ▾</button>
+                <div className="dropdown-content right">
+                  <NavLink
+                    to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                    className="dropdown-link"
+                  >
+                    Dashboard
+                  </NavLink>
+                  <button className="logout-btn" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </div>
+              </div>
             )}
 
-            {/* Cart */}
-            <li className="nav-item">
-              <NavLink className="btn btn-outline-primary position-relative" to="/cart">
-                Cart
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  {cart.length}
-                </span>
-              </NavLink>
-            </li>
-          </ul>
+            <NavLink to="/cart" className="cart-btn">
+              <HiShoppingCart size={20} />
+              {cart?.length > 0 && <span className="cart-badge">{cart.length}</span>}
+            </NavLink>
+          </div>
+        </div>
+
+        {/* Mobile Toggle */}
+        <div className="mobile-toggle">
+          <button className="toggle-btn" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <HiX size={28} /> : <HiMenu size={28} />}
+          </button>
         </div>
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="mobile-menu">
+          <div className="mobile-nav">
+            <Suspense fallback={<div>Loading...</div>}>
+              <Search />
+            </Suspense>
+
+            <NavLink
+              to="/"
+              className="mobile-link"
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </NavLink>
+
+            <span className="mobile-heading">Categories</span>
+            <NavLink
+              to="/categories"
+              className="mobile-link"
+              onClick={() => setMenuOpen(false)}
+            >
+              All Categories
+            </NavLink>
+            {renderCategories()}
+
+            {!auth?.user ? (
+              <>
+                <NavLink
+                  to="/register"
+                  className="mobile-link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Register
+                </NavLink>
+                <NavLink
+                  to="/login"
+                  className="mobile-link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Login
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to={auth.user.role === 1 ? "/dashboard/admin" : "/dashboard/user"}
+                  className="mobile-link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Dashboard
+                </NavLink>
+                <button className="logout-btn" onClick={handleLogout}>
+                  Logout
+                </button>
+              </>
+            )}
+
+            <NavLink
+              to="/cart"
+              className="mobile-link mobile-cart"
+              onClick={() => setMenuOpen(false)}
+            >
+              <HiShoppingCart size={20} />
+              <span className="ml-2">Cart</span>
+              {cart?.length > 0 && <span className="cart-badge">{cart.length}</span>}
+            </NavLink>
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
 

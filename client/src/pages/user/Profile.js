@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/auth";
+import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Layout from "../../components/Layout/Layout"; // use your custom Layout
+import Layout from "../../components/Layout/Layout";
 import UserMenu from "../../components/Layout/UserMenu";
 
 const Profile = () => {
   const [auth, setAuth] = useAuth();
+  const API = process.env.REACT_APP_API_URL;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,17 +16,17 @@ const Profile = () => {
   const [address, setAddress] = useState("");
 
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
-    setName(name);
-    setPhone(phone);
-    setEmail(email);
-    setAddress(address);
+    const { email, name, phone, address } = auth?.user || {};
+    setName(name || "");
+    setEmail(email || "");
+    setPhone(phone || "");
+    setAddress(address || "");
   }, [auth?.user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.put("/api/v1/auth/profile", {
+      const { data } = await axios.put(`${API}/api/v1/auth/profile`, {
         name,
         email,
         password,
@@ -37,7 +38,7 @@ const Profile = () => {
         toast.error(data?.error);
       } else {
         setAuth({ ...auth, user: data?.updatedUser });
-        let ls = JSON.parse(localStorage.getItem("auth"));
+        const ls = JSON.parse(localStorage.getItem("auth"));
         ls.user = data.updatedUser;
         localStorage.setItem("auth", JSON.stringify(ls));
         toast.success("Profile Updated Successfully");
@@ -50,79 +51,86 @@ const Profile = () => {
 
   return (
     <Layout title="Your Profile">
-      <div className="container-fluid m-3 p-3">
-        <div className="row">
-          {/* Sidebar */}
-          <div className="col-md-3 ">
+      <div className="container mx-auto p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/4">
             <UserMenu />
           </div>
 
-          {/* Profile Form */}
-          <div className="col-md-9">
-            <div className="card shadow">
-              <div className="card-body">
-                <h4 className="mb-4 text-center">User Profile</h4>
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="form-control"
-                      placeholder="Enter Your Name"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="form-control"
-                      placeholder="Enter Your Email"
-                      disabled
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Password</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="form-control"
-                      placeholder="Enter Your Password"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Phone</label>
-                    <input
-                      type="text"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="form-control"
-                      placeholder="Enter Your Phone"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Address</label>
-                    <input
-                      type="text"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="form-control"
-                      placeholder="Enter Your Address"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <button type="submit" className="btn btn-primary">
-                      Update
-                    </button>
-                  </div>
-                </form>
+          <div className="lg:w-3/4 bg-white shadow-md rounded p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">User Profile</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Your Name"
+                  autoFocus
+                />
               </div>
-            </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  className="w-full border border-gray-300 rounded p-2 bg-gray-100 cursor-not-allowed"
+                  placeholder="Enter Your Email"
+                  disabled
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Your Password"
+                />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Phone</label>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Your Phone"
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-1">Address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Your Address"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-300"
+                >
+                  Update Profile
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

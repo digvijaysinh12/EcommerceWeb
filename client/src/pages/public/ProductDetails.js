@@ -1,136 +1,102 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '../../components/Layout/Layout';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import Layout from "../../components/Layout/Layout";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const ProductDetails = () => {
   const params = useParams();
   const [product, setProduct] = useState({});
-  const [realtedProducts, setRealtedProducts] = useState([])
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const navigate = useNavigate();
 
+  const BASE_URL = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
-    if (params?.slug) getProduct();
+    if (params?.slug) fetchProduct();
   }, [params?.slug]);
 
-  const getProduct = async () => {
+  const fetchProduct = async () => {
     try {
-      const { data } = await axios.get(`/api/v1/product/get-product/${params.slug}`);
+      const { data } = await axios.get(`${BASE_URL}/api/v1/product/get-product/${params.slug}`);
       setProduct(data?.product);
-      getSimilarProduct(data?.product._id,data?.product.category._id)
+      fetchRelatedProducts(data?.product._id, data?.product.category._id);
     } catch (error) {
       console.log(error);
     }
   };
 
-  //get similar product
-  const getSimilarProduct = async(pid,cid) => {
-    try{
-      const {data} = await axios.get(`/api/v1/product/realted-product/${pid}/${cid}`);
-      setRealtedProducts(data?.product);
-      console.log(data.product);
-    }catch(error){
+  const fetchRelatedProducts = async (pid, cid) => {
+    try {
+      const { data } = await axios.get(`${BASE_URL}/api/v1/product/realted-product/${pid}/${cid}`);
+      setRelatedProducts(data?.product || []);
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
+
   return (
-    <Layout>
-      <div
-        className="container mt-5"
-        style={{
-          backgroundColor: '#f8f9fa', // Light background for the page
-          backgroundImage: 'url("https://via.placeholder.com/1500")', // Example background image URL
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          padding: '50px 0',
-        }}
-      >
-        <div className="row">
-          <div className="col-md-6">
-            <img
-              src={`/api/v1/product/product-photo/${product._id}`}
-              className="img-fluid rounded shadow-sm"
+    <Layout title={product.name || "Product Details"}>
+      <div className="container mx-auto px-4 py-8">
+        {/* Product Section */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/2 flex justify-center">
+            <LazyLoadImage
+              src={`${BASE_URL}/api/v1/product/product-photo/${product._id}`}
               alt={product.name}
-              style={{ maxHeight: '400px', objectFit: 'contain' }}
+              effect="blur"
+              className="rounded shadow-md object-contain h-96 w-full"
             />
           </div>
-          <div className="col-md-6">
-            <div
-              className="product-details p-4"
-              style={{
-                backgroundColor: '#ffffff', // White background for the product details section
-                borderRadius: '8px', // Rounded corners
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Light shadow for depth
-              }}
+
+          <div className="lg:w-1/2 bg-white p-6 rounded shadow-md flex flex-col gap-4">
+            <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
+            <p className="text-gray-600">{product.description}</p>
+            <p className="text-blue-600 font-bold text-xl">${product.price}</p>
+            <p className="text-gray-700">
+              <strong>Quantity:</strong> {product.quantity}
+            </p>
+            <p className="text-gray-700">
+              <strong>Shipping:</strong> {product.shipping ? "Available" : "Not Available"}
+            </p>
+            <button
+              className="bg-red-600 text-white py-3 rounded mt-4 hover:bg-red-700 transition w-full"
             >
-              <h1 className="text-center mb-4" style={{ fontFamily: 'Arial, sans-serif', color: '#333' }}>
-                {product.name}
-              </h1>
-              <div>
-                <h5 style={{ fontWeight: 'bold', color: '#555' }}>
-                  <strong>Description:</strong> {product.description}
-                </h5>
-                <h5 style={{ fontWeight: 'bold', color: '#555' }}>
-                  <strong>Price:</strong> ${product.price}
-                </h5>
-                <h5 style={{ fontWeight: 'bold', color: '#555' }}>
-                  <strong>Quantity:</strong> {product.quantity}
-                </h5>
-                <h5 style={{ fontWeight: 'bold', color: '#555' }}>
-                  <strong>Shipping:</strong> {product.shipping ? 'Available' : 'Not Available'}
-                </h5>
-                <button
-                  className="btn btn-danger btn-lg mt-3"
-                  style={{
-                    width: '100%', // Full width button
-                    fontSize: '18px', // Larger text for button
-                    padding: '10px 0', // More padding for the button
-                  }}
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </div>
+              Add to Cart
+            </button>
           </div>
         </div>
 
-        <div className="row mt-5">
-          <h3 className="text-center" style={{ color: '#444' }}>
-            Similar Products
-          </h3>
-          {realtedProducts.length <0 && <p>No Similar Products Found</p>}
-          {realtedProducts?.map((p) => (
-                <div className="card m-2" style={{ width: "18rem" }} key={p._id}>
-                  <div className="card h-100 shadow-sm " style={{ display: 'flex', flexDirection: 'column' }}>
-
-                    <img
-                      src={`/api/v1/product/product-photo/${p._id}`}
-                      className="card-img-top"
-                      alt={p.name}
-                      style={{
-                        objectFit: 'cover',  // Ensure the image covers the area
-                        height: '300px', // Set a fixed height for the image
-                      }}
-                    />
-
-                    <div className="card-body " style={{ flex: 1 }}>
-                      <h5 className="card-title">{p.name}</h5>
-                      <p className="card-text" style={{ fontSize: '13px' }}>
-                        {p.description.substring(0, 30)}...
-                      </p>
-                      <p className="card-text" style={{ fontSize: '13px' }}>
-                        $ {p.price}
-                      </p>
-                      <button 
-                        className='btn btn-secondary ms-1'
-                      >
-                        ADD TO CART
-                      </button>
-                    </div>
+        {/* Related Products */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Similar Products</h2>
+          {relatedProducts.length === 0 ? (
+            <p className="text-center text-gray-500">No Similar Products Found</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((p) => (
+                <div key={p._id} className="bg-white shadow-md rounded flex flex-col overflow-hidden">
+                  <LazyLoadImage
+                    src={`${BASE_URL}/api/v1/product/product-photo/${p._id}`}
+                    alt={p.name}
+                    effect="blur"
+                    className="h-64 w-full object-cover"
+                  />
+                  <div className="p-4 flex flex-col flex-1">
+                    <h5 className="font-semibold">{p.name}</h5>
+                    <p className="text-gray-500 text-sm mt-1">{p.description?.substring(0, 60)}...</p>
+                    <p className="text-blue-600 font-bold mt-2">${p.price}</p>
+                    <button
+                      className="mt-auto bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition"
+                    >
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
         </div>
       </div>
     </Layout>

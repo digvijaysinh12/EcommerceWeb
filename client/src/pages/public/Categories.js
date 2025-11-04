@@ -1,25 +1,30 @@
-
-import React from 'react'
-import Layout from '../../components/Layout/Layout'
-import useCategory from '../../hooks/useCategory'
-import { Link } from 'react-router-dom'
-
+import React from "react";
+import Layout from "../../components/Layout/Layout";
+import useCategory from "../../hooks/useCategory";
+import { Link } from "react-router-dom";
 
 const Categories = () => {
-    const categories = useCategory()
-    return (
-        <Layout title={'All Categories'}>
-            <div className='container'>
-                <div className='row'>
-                {categories.map((c) => (                
-                    <div className='col-md-6 mt-5 mb-3 gx-3 gy-3' key={c._id}>
-                    <Link to={`category/${c.slug}`} className='btn btn-primary' >{c.name}</Link>
-                    </div>))}
+  const categories = useCategory();
 
-                </div>
-            </div>
-        </Layout>
-    )
-}
+  return (
+    <Layout title="All Categories">
+      <div className="max-w-7xl mx-auto px-4 mt-6">
+        <h2 className="text-3xl font-bold text-center mb-8">All Categories</h2>
 
-export default Categories
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {categories?.map((c) => (
+            <Link
+              key={c._id}
+              to={`/category/${c.slug}`}
+              className="bg-blue-600 text-white text-center py-4 px-6 rounded-lg shadow hover:bg-blue-500 transition"
+            >
+              {c.name}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Categories;

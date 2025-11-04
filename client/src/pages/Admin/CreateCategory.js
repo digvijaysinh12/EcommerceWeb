@@ -1,50 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import Layout from "../../components/Layout/Layout";
-import AdminMenu from "../../components/Layout/AdminMenu";
 import { toast } from "react-toastify";
 import axios from "axios";
-import 'antd/dist/reset.css';
 import CategoryForm from "../../components/Form/CategoryForm";
 import { Modal } from "antd";
 
-const CreateCategory = () => {
+const AdminMenu = lazy(() => import("../../components/Layout/AdminMenu"));
 
+const CreateCategory = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
-  const [loading, setLoading] = useState(false);  // Added loading state
+  const [loading, setLoading] = useState(false);
 
-  // Handle category creation form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post('/api/v1/category/create-category', { name });
-      if (data?.success) {
-        toast.success(`${name} is created`);
-        setName("");  // Clear the input field
-        getAllCategory();  // Refresh category list
-      } else {
-        toast.error(data.message);
-        setName("");  // Clear the input field
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went wrong in input form');
-    }
-  };
+  const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // Get all categories
+  // Fetch all categories
   const getAllCategory = async () => {
     try {
-      const { data } = await axios.get('/api/v1/category/get-category');
-      if (data?.success) {
-        setCategories(data?.category);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went wrong in getting category');
+      const { data } = await axios.get(`${BASE_URL}/api/v1/category/get-category`);
+      if (data?.success) setCategories(data.category);
+    } catch (err) {
+      toast.error("Failed to fetch categories");
     }
   };
 
@@ -52,109 +31,152 @@ const CreateCategory = () => {
     getAllCategory();
   }, []);
 
-  // Handle category update
-  const handleUpdate = async (e) => {
+  // Create new category
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);  // Start loading
+    if (!name) return toast.error("Please enter a category name");
     try {
-      const { data } = await axios.put(`/api/v1/category/update-category/${selected._id}`, { name: updatedName });
-      if (data.success) {
-        toast.success(`${updatedName} is updated`);
-        setSelected(null);
-        setUpdatedName("");
-        setVisible(false);
+      const { data } = await axios.post(`${BASE_URL}/api/v1/category/create-category`, { name });
+      if (data?.success) {
+        toast.success(`${name} created successfully`);
+        setName("");
         getAllCategory();
       } else {
         toast.error(data.message);
       }
-    } catch (error) {
-      toast.error('Something went wrong in Update Category');
-    } finally {
-      setLoading(false);  // Stop loading
+    } catch (err) {
+      toast.error("Something went wrong while creating category");
     }
   };
 
-  // Handle category deletion
-  const handleDelete = async (pid, name) => {
+  // Update category
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      const { data } = await axios.delete(`/api/v1/category/delete-category/${pid}`);
+      const { data } = await axios.put(
+        `${BASE_URL}/api/v1/category/update-category/${selected._id}`,
+        { name: updatedName }
+      );
       if (data.success) {
-        toast.success(`${name} is deleted`);
+        toast.success(`${updatedName} updated successfully`);
+        setVisible(false);
+        setUpdatedName("");
+        setSelected(null);
         getAllCategory();
       } else {
         toast.error(data.message);
       }
-    } catch (error) {
-      toast.error('Something went wrong in Delete Category');
+    } catch (err) {
+      toast.error("Failed to update category");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete category
+  const handleDelete = async (id, name) => {
+    try {
+      const { data } = await axios.delete(`${BASE_URL}/api/v1/category/delete-category/${id}`);
+      if (data.success) {
+        toast.success(`${name} deleted successfully`);
+        getAllCategory();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error("Failed to delete category");
     }
   };
 
   return (
-    <Layout title={"Dashboard - Create Category"}>
-      <div className="container-fluid m-3 p-3">
-        <div className="row">
-          <div className="col-md-3">
-            <AdminMenu />
+    <Layout title="Admin - Manage Categories">
+      <div className="container mx-auto p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar */}
+          <div className="lg:w-1/4">
+            <Suspense fallback={<div className="text-center text-gray-500">Loading menu...</div>}>
+              <AdminMenu />
+            </Suspense>
           </div>
-          <div className="col-md-9 ">
-            <h1 className="text-center">Manage Category</h1>
-            <div className="w-100 d-flex justify-content-center">
-              <CategoryForm handleSubmit={handleSubmit} value={name} setValue={setName} />
-            </div>
-            <div className="w-50 mx-auto">
-              <table className="table  ">
-                <thead >
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories?.length > 0 ? (
-                    categories.map(c => (
-                      <tr key={c._id}>
-                        <td>{c.name}</td>
-                        <td>
-                          <button
-                            className="btn btn-primary ms-2"
-                            onClick={() => {
-                              setVisible(true);
-                              setUpdatedName(c.name);
-                              setSelected(c);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-danger ms-2"
-                            onClick={() => handleDelete(c._id, c.name)}
-                          >
-                            Delete
-                          </button>
+
+          {/* Main content */}
+          <div className="lg:w-3/4">
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+                Manage Categories
+              </h2>
+
+              {/* Create form */}
+              <div className="max-w-md mx-auto mb-6">
+                <CategoryForm handleSubmit={handleSubmit} value={name} setValue={setName} />
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead className="bg-indigo-600 text-white">
+                    <tr>
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categories.length > 0 ? (
+                      categories.map((c) => (
+                        <tr key={c._id} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-2">{c.name}</td>
+                          <td className="px-4 py-2">
+                            <button
+                              className="px-3 py-1 mr-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition"
+                              onClick={() => {
+                                setVisible(true);
+                                setUpdatedName(c.name);
+                                setSelected(c);
+                              }}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                              onClick={() => handleDelete(c._id, c.name)}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="2" className="px-4 py-6 text-center text-gray-500">
+                          No categories found
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="2">No categories found</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <Modal
-            onCancel={() => {
-              setVisible(false);
-              setUpdatedName(""); // Reset updated name when modal closes
-            }}
-            footer={null}
-            visible={visible}
-          >
-            <CategoryForm value={updatedName} setValue={setUpdatedName} handleSubmit={handleUpdate} disabled={loading} />
-          </Modal>
         </div>
       </div>
+
+      {/* Modal for editing */}
+      <Modal
+        onCancel={() => {
+          setVisible(false);
+          setUpdatedName("");
+        }}
+        footer={null}
+        open={visible}
+      >
+        <CategoryForm
+          value={updatedName}
+          setValue={setUpdatedName}
+          handleSubmit={handleUpdate}
+          disabled={loading}
+        />
+      </Modal>
     </Layout>
   );
 };

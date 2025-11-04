@@ -1,92 +1,95 @@
-import React, { useEffect, useState } from 'react'
-import UserMenu from '../../components/Layout/UserMenu'
-import Layout from '../../components/Layout/Layout'
+import React, { useEffect, useState } from 'react';
+import UserMenu from '../../components/Layout/UserMenu';
+import Layout from '../../components/Layout/Layout';
 import axios from 'axios';
-import { useAuth } from '../../context/auth';
-import moment from 'moment'
+import { useAuth } from '../../context/AuthContext';
+import moment from 'moment';
 
 const Orders = () => {
-  const [Orders, setOrders] = useState([]);
-  const [auth, setAuth] = useAuth()
+  const [orders, setOrders] = useState([]);
+  const [auth] = useAuth();
+
+  const API = process.env.REACT_APP_API_URL;
 
   const getOrders = async () => {
     try {
-      const { data } = await axios.get('/api/v1/auth/orders');
+      const { data } = await axios.get(`${API}/api/v1/auth/orders`, {
+        headers: {
+          Authorization: auth?.token, // ensure token is passed if needed
+        },
+      });
       setOrders(data);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    if (auth?.token) getOrders()
-  }, [auth?.token])
+    if (auth?.token) getOrders();
+  }, [auth?.token]);
 
   return (
-    <Layout>
-      <div className='container-fluid m-3 p-3'>
-        <div className='row'>
-          <div className='col-md-3'>
+    <Layout title="All Orders">
+      <div className="container mx-auto p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/4">
             <UserMenu />
           </div>
-          <div className='col-md-9'>
-            <h1 className='text-center'>All Orders</h1>
-            {
-              Orders?.map((o,i) => {
-                return(
-                  <div className='border shadow'>
-                    <table className='table'>
-                      <thead>
+
+          <div className="lg:w-3/4">
+            <h1 className="text-2xl font-bold text-center mb-6">All Orders</h1>
+            <div className="space-y-6">
+              {orders?.map((order, idx) => (
+                <div key={order._id} className="bg-white shadow-md rounded p-4">
+                  <div className="overflow-x-auto mb-4">
+                    <table className="min-w-full table-auto border border-gray-200">
+                      <thead className="bg-gray-100">
                         <tr>
-                          <td scope='col'>#</td>
-                          <td scope='col'>Status</td>
-                          <td scope='col'>Buyer</td>
-                          <td scope='col'>Orders</td>
-                          <td scope='col'>Payment</td>
-                          <td scope='col'>Quantity</td>
+                          <th className="px-4 py-2 border">#</th>
+                          <th className="px-4 py-2 border">Status</th>
+                          <th className="px-4 py-2 border">Buyer</th>
+                          <th className="px-4 py-2 border">Ordered At</th>
+                          <th className="px-4 py-2 border">Payment</th>
+                          <th className="px-4 py-2 border">Quantity</th>
                         </tr>
                       </thead>
                       <tbody>
-                          <tr>
-                            <th>{i+1}</th>
-                            <th>{o?.status}</th>
-                            <th>{o?.buyer?.name}</th>
-                            <th>{moment(o?.createdAt).fromNow()}</th>
-                            <th>{o?.payment.success ? "Success":"Failed"}</th>
-                            <th>{o?.products?.length}</th>
-                          </tr>
+                        <tr className="text-center">
+                          <td className="px-4 py-2 border">{idx + 1}</td>
+                          <td className="px-4 py-2 border">{order.status}</td>
+                          <td className="px-4 py-2 border">{order.buyer?.name}</td>
+                          <td className="px-4 py-2 border">{moment(order.createdAt).fromNow()}</td>
+                          <td className="px-4 py-2 border">{order.payment.success ? "Success" : "Failed"}</td>
+                          <td className="px-4 py-2 border">{order.products?.length}</td>
+                        </tr>
                       </tbody>
                     </table>
-                    <div className='container'>
-                                  {o?.products?.map((p,i) => (
-              <div className="row mb-2 p-3 card flex-row" key={p._id}>
-                <div className="col-md-4">
-                  <img
-                    src={`/api/v1/product/product-photo/${p._id}`}
-                    className="card-img-top"
-                    alt={p.name}
-                    width="100px"
-                    height={"100px"}
-                  />
-                </div>
-                <div className="col-md-8">
-                  <p>{p.name}</p>
-                  <p>{p.description.substring(0, 30)}</p>
-                  <p>Price : {p.price}</p>
-                </div>
-              </div>
-            ))}
-                    </div>
                   </div>
-                )
-              })
-            }
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {order.products?.map((p) => (
+                      <div key={p._id} className="flex bg-gray-50 p-3 rounded shadow-sm">
+                        <img
+                          src={`${API}/api/v1/product/product-photo/${p._id}`}
+                          alt={p.name}
+                          className="w-24 h-24 object-cover rounded mr-4"
+                        />
+                        <div>
+                          <h4 className="font-semibold">{p.name}</h4>
+                          <p className="text-gray-500 text-sm">{p.description.substring(0, 30)}...</p>
+                          <p className="text-gray-700 font-medium">Price: ₹{p.price}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Orders
+export default Orders;
