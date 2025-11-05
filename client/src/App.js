@@ -11,7 +11,6 @@ const Home = lazy(() => import("./pages/public/Home"));
 const About = lazy(() => import("./pages/public/About"));
 const Contact = lazy(() => import("./pages/public/Contact"));
 const Policy = lazy(() => import("./pages/public/Policy"));
-const PageNotFound = lazy(() => import("./pages/public/NotFound"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
