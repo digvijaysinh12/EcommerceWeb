@@ -9,7 +9,7 @@ const { Option } = Select;
 // Lazy load AdminMenu
 const AdminMenu = lazy(() => import("../../components/Layout/AdminMenu"));
 
-const Orders = () => {
+const AdminOrders = () => {
   const BASE_URL = process.env.REACT_APP_API_URL;
   const [status] = useState([
     "Not Process",
@@ -149,4 +149,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default AdminOrders;
