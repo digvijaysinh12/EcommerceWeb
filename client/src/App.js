@@ -11,12 +11,12 @@ const Home = lazy(() => import("./pages/public/Home"));
 const About = lazy(() => import("./pages/public/About"));
 const Contact = lazy(() => import("./pages/public/Contact"));
 const Policy = lazy(() => import("./pages/public/Policy"));
-const Register = lazy(() => import("./pages/auth/Register"));
-const Login = lazy(() => import("./pages/auth/Login"));
-const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
-const Dashboard = lazy(() => import("./pages/user/Dashboard"));
-const Profile = lazy(() => import("./pages/user/Profile"));
-const Orders = lazy(() => import("./pages/user/Orders"));
+const Register = lazy(() => import("./pages/Auth/Register"));
+const Login = lazy(() => import("./pages/Auth/Login"));
+const ForgotPassword = lazy(() => import("./pages/Auth/ForgotPassword"));
+const Dashboard = lazy(() => import("./pages/User/Dashboard"));
+const Profile = lazy(() => import("./pages/User/Profile"));
+const Orders = lazy(() => import("./pages/User/Orders"));
 
 const AdminOrders = lazy(() => import("./pages/Admin/Orders"));
 const CreateCategory = lazy(() => import("./pages/Admin/CreateCategory"));
