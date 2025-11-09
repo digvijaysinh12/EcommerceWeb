@@ -18,13 +18,12 @@ const Dashboard = lazy(() => import("./pages/user/Dashboard"));
 const Profile = lazy(() => import("./pages/user/Profile"));
 const Orders = lazy(() => import("./pages/user/Orders"));
 
-const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
-const CreateCategory = lazy(() => import("./pages/admin/CreateCategory"));
-const CreateProduct = lazy(() => import("./pages/admin/CreateProduct"));
-const Product = lazy(() => import("./pages/admin/Product"));
-const UpdateProduct = lazy(() => import("./pages/admin/UpdateProduct"));
-const Users = lazy(() => import("./pages/admin/Users"));
-const AdminOrders = lazy(() => import("./pages/admin/Orders")); 
+const AdminOrders = lazy(() => import("./pages/Admin/Orders"));
+const CreateCategory = lazy(() => import("./pages/Admin/CreateCategory"));
+const CreateProduct = lazy(() => import("./pages/Admin/CreateProduct"));
+const Product = lazy(() => import("./pages/Admin/Product"));
+const UpdateProduct = lazy(() => import("./pages/Admin/UpdateProduct"));
+const Users = lazy(() => import("./pages/Admin/Users"));
 
 const Search = lazy(() => import("./pages/public/Search"));
 const ProductDetails = lazy(() => import("./pages/public/ProductDetails"));
