@@ -24,6 +24,7 @@ const CreateProduct = lazy(() => import("./pages/Admin/CreateProduct"));
 const Product = lazy(() => import("./pages/Admin/Product"));
 const UpdateProduct = lazy(() => import("./pages/Admin/UpdateProduct"));
 const Users = lazy(() => import("./pages/Admin/Users"));
+const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'))
 
 const Search = lazy(() => import("./pages/public/Search"));
 const ProductDetails = lazy(() => import("./pages/public/ProductDetails"));
