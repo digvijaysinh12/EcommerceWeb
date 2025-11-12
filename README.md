@@ -1,31 +1,40 @@
-# 🛒 Ecommerce WebSite | MERN Stack Project
+🛍️ ShopEase – E-Commerce Web Application | MERN Stack Project
 
-This is a full-featured ecommerce application built using the **MERN stack**: **MongoDB**, **Express.js**, **React**, and **Node.js**.  
-It demonstrates real-world features such as user authentication, product management, shopping cart functionality, order processing, and payment gateway integration.
+This is a full-featured E-Commerce web application built using the MERN stack — MongoDB, Express.js, React, and Node.js.
+It showcases real-world functionalities such as user authentication, product management, shopping cart, order processing, and secure payment gateway integration using Braintree.
 
----
+🚀 Tech Stack
 
-## 🚀 Tech Stack
+Frontend: React.js, React Router, Axios, Bootstrap, CSS
 
-- **Frontend**: React, React Router, Axios, Bootstrap  
-- **Backend**: Node.js, Express.js  
-- **Database**: MongoDB  
-- **Authentication**: JWT (JSON Web Tokens)  
-- **Payment Gateway**: PayPal API  
-- **Other Tools**: Redux Toolkit, Mongoose, dotenv  
+Backend: Node.js, Express.js
 
----
+Database: MongoDB, Mongoose
 
-## 💡 Features
+Authentication: JWT (JSON Web Tokens), bcrypt
 
-- 🔐 **User Authentication & Authorization** (Admin/User roles)
-- 🛍️ **Product Management** (CRUD operations)
-- 🛒 **Shopping Cart**
-- 💳 **Payment Integration** (PayPal)
-- 📦 **Order Management**
-- 📱 **Responsive UI**
-- 🧾 **Order History and Invoice View**
+Payment Gateway: Braintree API
 
----
+Other Tools: fs, slugify, dotenv
 
-> ⭐ This project is built to showcase full-stack development skills using modern web technologies.
+💡 Features
+
+🔐 User Authentication & Authorization – JWT-based login/registration with bcrypt-hashed passwords and Admin/User roles.
+
+🛍️ Product Management – Full CRUD operations with validation for images, slugs, and product details.
+
+🧭 Search & Filters – Keyword search using MongoDB regex; filter by category or price range with latest products prioritized.
+
+📦 Product & Category Management – Dynamic category linking using Mongoose populate and optimized product fetching.
+
+🛒 Shopping Cart & Wishlist – Add/remove items, real-time updates for quantity and total amount.
+
+💳 Checkout & Payments (Braintree) – Secure payment flow with frontend token fetch → backend processing → MongoDB order storage and stock updates.
+
+🧾 Order Management & Admin Dashboard – Manage orders, view sales, and track product performance in real time.
+
+📱 Responsive UI – Clean and modern layout optimized for both mobile and desktop devices.
+
+⚙️ Security & Error Handling – Protected routes, input validation, and safe transaction error management.
+
+⭐ This project demonstrates complete full-stack development skills — covering backend REST APIs, frontend state management, authentication, database design, and secure payment integration using modern web technologies.
